@@ -148,7 +148,7 @@ update_v_status <- function(vid, vtable, etable, s_table, ua = 0.3){
     } else {
         prob <- sapply(nei, function(x) {
             cal_attraction(x, vid, vtable, etable, s_table)})
-        to_vid <- sample(nei, 1, prob = prob) # 轮盘赌
+        to_vid <- sample(nei, 1, prob = prob/sum(prob)) # 轮盘赌
     }
     res <- sample(c(vid, to_vid), 1, prob = c(0.95, 0.05))
     if(sample(c(TRUE, FALSE),1,prob=c(ua, 1 - ua))){
