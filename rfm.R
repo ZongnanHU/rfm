@@ -119,6 +119,16 @@ count_agent <- function(vid, s_table){
 }
 
 
+## 获取邻域
+neigbor <- function(vid, etable){
+    return(etable$to[etable$from == vid])
+}
+
+
+##------------------------------------------------------------------
+## 算法核心
+
+
 ## 计算 vid1 对 vid2 的引力
 cal_attraction <- function(vid1, vid2, vtable, etable, s_table){
     v1 <- v_attr(vtable, vid1, "value")
@@ -128,16 +138,6 @@ cal_attraction <- function(vid1, vid2, vtable, etable, s_table){
     dis <- e_dis(vid1, vid2, etable)
     return(c1*v1/(dis*dis))
 }
-
-
-## 获取邻域
-neigbor <- function(vid, etable){
-    return(etable$to[etable$from == vid])
-}
-
-
-##------------------------------------------------------------------
-## 算法核心
 
 
 ## 状态更新函数
