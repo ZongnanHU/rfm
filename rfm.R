@@ -192,3 +192,38 @@ main_simulate <- function(init_table,
     }
     return(bind_rows(res))
 }
+
+
+##------------------------------------------------------------------
+## 模拟结果输出
+
+
+## 将 main_simulate 生成的结果输出
+plot_simulate <- function(simulate_res, outdir, all = FALSE){
+    if(all){
+        ivids <- unique(simulate_res$vid)
+        tis <- unique(simulate_res$time)
+    } else {
+        ivids <- simulate_res$vid[length(simulate_res$vid)]
+        tis <- simulate_res$ti[length(simulate_res$time)]
+    }
+    for(ivid in ivids){
+        p1 <- simulate_res %>%
+            filter(ivid == vid) %>%
+            ggplot() +
+            geom_histogram(aes(x = time))
+        ggsave(file.path(outdir,
+                         paste("fig_vid", ivid, ".png", sep = "")),
+               p1)
+    }
+    for(ti in tis){
+        p1 <- simulate_res %>%
+            filter(ti == time) %>%
+            ggplot() +
+            geom_histogram(aes(x = vid)) +
+            scale_x_continuous(breaks= sort(ivids))
+        ggsave(file.path(outdir,
+                         paste("fig_time", ti, ".png", sep = "")),
+               p1)
+    }
+}
