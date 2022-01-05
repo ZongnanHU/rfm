@@ -134,7 +134,13 @@ cal_attraction <- function(vid1, vid2, vtable, etable, s_table){
     c1 <- count_agent(vid1, s_table)
     c2 <- count_agent(vid2, s_table)
     dis <- e_dis(vid1, vid2, etable)
-    return(c1/(dis*dis))
+    sigmoid <- 1/(1+exp(-((c1+1)/(c2+1))))
+    ## 引力是否存在
+    if(sample(c(TRUE, FALSE), 1, prob = c(sigmoid, 1 - sigmoid))){
+        return(1/(dis*dis))
+    } else{
+        return(c1/(dis*dis))
+    }
 }
 
 
