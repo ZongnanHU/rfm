@@ -131,10 +131,10 @@ neigbor <- function(vid, etable){
 
 ## 计算 vid1 对 vid2 的引力
 cal_attraction <- function(vid1, vid2, vtable, etable, s_table){
-    c1 <- count_agent(v1, s_table)
-    c2 <- count_agent(v2, s_table)
+    c1 <- count_agent(vid1, s_table)
+    c2 <- count_agent(vid2, s_table)
     dis <- e_dis(vid1, vid2, etable)
-    return(1/(dis*dis))
+    return(c1/(dis*dis))
 }
 
 
