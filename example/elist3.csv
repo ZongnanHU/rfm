@@ -1,12 +1,8 @@
-dis,from,to
-10,1,3
-5,1,2
-5,1,4
-10,1,5
-10,1,6
-5,1,11
-10,7,8
-10,7,10
-10,7,9
-5,4,7
-5,11,7
+"dis","from","interaction","name","selected","shared interaction","shared name","to"
+"5","1","interacts with","Node 1 (interacts with) Node 6","false","interacts with","Node 1 (interacts with) Node 6","6"
+"5","1","interacts with","Node 1 (interacts with) Node 5","false","interacts with","Node 1 (interacts with) Node 5","5"
+"5","1","interacts with","Node 1 (interacts with) Node 4","false","interacts with","Node 1 (interacts with) Node 4","4"
+"5","1","interacts with","Node 1 (interacts with) Node 3","false","interacts with","Node 1 (interacts with) Node 3","3"
+"5","1","interacts with","Node 1 (interacts with) Node 2","false","interacts with","Node 1 (interacts with) Node 2","2"
+"5","2","interacts with","2 (interacts with) 3","false","interacts with","2 (interacts with) 3","3"
+"5","4","interacts with","4 (interacts with) 3","false","interacts with","4 (interacts with) 3","3"
