@@ -109,7 +109,8 @@ init_status_table <- function(vtable, anum){
     return(data.frame(
         aid = 1:length(vids),
         vid = vids,
-        time = 1))
+        time = 1,
+        rep = 0))
 }
 
 
@@ -170,12 +171,14 @@ update_v_status <- function(vid, vtable, etable, s_table, ua = 0.3){
 update_s_table <- function(s_table,
                            vtable,
                            etable,
-                           up_func = update_v_status){
+                           up_func = update_v_status,
+                           rep = 1){
     time <- s_table[1,3] + 1
     res <- t(sapply(1:nrow(s_table), function(row){
         c(s_table$aid[row],
           up_func(s_table$vid[row], vtable, etable, s_table),
-          time)}))
+          time,
+          rep)}))
     res <- as.data.frame(res)
     colnames(res) <- colnames(s_table)
     return(res)
@@ -187,13 +190,20 @@ main_simulate <- function(init_table,
                           vtable,
                           etable,
                           up_func = update_v_status,
-                          times = 1000){
+                          times = 1000,
+                          rep = 10){
     res <- list()
-    res[[1]] <- init_table
-    for(time in 2:(times + 1)){
-        res[[time]] <- update_s_table(res[[time-1]], vtable, etable,
-                                      up_func)
-        cat(time, "\n")
+    for(i in 1:rep){
+        sub_res <- list()
+        init_table$rep <- i
+        sub_res[[1]] <- init_table
+        for(time in 2:(times + 1)){
+            sub_res[[time]] <- update_s_table(sub_res[[time-1]],
+                                              vtable, etable,
+                                              up_func, i)
+            cat(i, ":", time, "\n")
+        }
+        res <- c(res, sub_res)
     }
     return(bind_rows(res))
 }
@@ -215,10 +225,16 @@ plot_simulate <- function(simulate_res, outdir, all = FALSE){
     for(ivid in ivids){
         p1 <- simulate_res %>%
             filter(ivid == vid) %>%
+            group_by(time, rep) %>%
+            summarise(n = n()) %>%
             group_by(time) %>%
-            summarise(count = n()) %>%
-            ggplot(aes(x = time, y = count)) +
-            geom_point()
+            summarise(m = mean(n),
+                      u = quantile(n, 0.95),
+                      d = quantile(n, 0.05)) %>%
+            ggplot(aes(x = time)) +
+            geom_line(aes(y = u), linetype="dotted") +
+            geom_line(aes(y = d), linetype="dotted") +
+            geom_line(aes(y = m))
         ggsave(file.path(outdir,
                          paste("fig_vid", ivid, ".png", sep = "")),
                p1)
@@ -226,9 +242,11 @@ plot_simulate <- function(simulate_res, outdir, all = FALSE){
     for(ti in tis){
         p1 <- simulate_res %>%
             filter(ti == time) %>%
-            ggplot() +
-            geom_histogram(aes(x = vid)) +
-            scale_x_continuous(breaks= sort(ivids))
+            group_by(vid, rep) %>%
+            summarise(n = n()) %>%
+            ggplot(aes(x = factor(vid), y = n)) +
+            geom_violin() +
+            geom_boxplot(width=.1, fill="black")
         ggsave(file.path(outdir,
                          paste("fig_time", ti, ".png", sep = "")),
                p1)
