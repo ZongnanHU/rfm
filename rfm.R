@@ -147,18 +147,19 @@ cal_attraction <- function(vid1, vid2, vtable, etable, s_table){
 ## 状态更新函数
 update_v_status <- function(vid, vtable, etable, s_table, ua = 0.3){
     nei <- neigbor(vid, etable)
-    if(length(nei) == 0) {
-        return(vid)
+    if(sample(c(TRUE, FALSE), 1, prob = c(0.99, 0.01))){
+        res <- vid
+    } else if(length(nei) == 0){
+        res <- vid
     } else if (length(nei) == 1){
-        to_vid <- nei
+        res <- nei
     } else {
         prob <- sapply(nei, function(x) {
             cal_attraction(x, vid, vtable, etable, s_table)})
-        to_vid <- sample(nei, 1, prob = prob/sum(prob)) # 轮盘赌
+        res <- sample(nei, 1, prob = prob/sum(prob)) # 轮盘赌
     }
-    res <- sample(c(vid, to_vid), 1, prob = c(0.95, 0.05))
-    if(sample(c(TRUE, FALSE),1,prob=c(ua, 1 - ua))){
-        return(update_v_status(to_vid, vtable,
+    if(sample(c(TRUE, FALSE), 1, prob = c(ua, 1 - ua))){
+        return(update_v_status(res, vtable,
                                etable, s_table, ua*0.6))
     }
     return(res)
