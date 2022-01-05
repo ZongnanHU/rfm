@@ -202,14 +202,16 @@ plot_simulate <- function(simulate_res, outdir, all = FALSE){
         ivids <- unique(simulate_res$vid)
         tis <- unique(simulate_res$time)
     } else {
-        ivids <- simulate_res$vid[length(simulate_res$vid)]
+        ivids <- unique(simulate_res$vid)
         tis <- simulate_res$ti[length(simulate_res$time)]
     }
     for(ivid in ivids){
         p1 <- simulate_res %>%
             filter(ivid == vid) %>%
-            ggplot() +
-            geom_histogram(aes(x = time))
+            group_by(time) %>%
+            summarise(count = n()) %>%
+            ggplot(aes(x = time, y = count)) +
+            geom_point()
         ggsave(file.path(outdir,
                          paste("fig_vid", ivid, ".png", sep = "")),
                p1)
