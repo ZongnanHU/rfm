@@ -252,3 +252,40 @@ plot_simulate <- function(simulate_res, outdir, all = FALSE){
                p1)
     }
 }
+
+
+##------------------------------------------------------------------
+## 衍生的表格
+
+## 经过 from 到其它节点的资源有哪些
+gen_spill_table <- function(simulate_res, from){
+    s_time <- min(simulate_res$time)
+    e_time <- max(simulate_res$time)
+    res <- list()
+    for(i in 1:max(simulate_res$rep)){
+        sub_res <- simulate_res[simulate_res$rep == i,]
+        aids <- sub_res$aid[sub_res$vid == from]
+        res[[i]] <- sub_res %>%
+            filter(aid %in% aids & time ==  e_time) %>%
+            group_by(vid, rep) %>%
+            summarise(n = n())
+    }
+    return(bind_rows(res))
+}
+
+## 最终在 to 节点的资源最初来自哪些节点
+gen_absorb_table <- function(simulate_res, to){
+    s_time <- min(simulate_res$time)
+    e_time <- max(simulate_res$time)
+    res <- list()
+    for(i in 1:max(simulate_res$rep)){
+        sub_res <- simulate_res[simulate_res$rep == i,]
+        aids <- simulate_res$aid[sub_res$vid == to
+                                 & sub_res$time == e_time]
+        res[[i]] <- sub_res %>%
+            filter(aid %in% aids & time == s_time) %>%
+            group_by(vid, rep) %>%
+            summarise(n = n())
+    }
+    return(bind_rows(res))
+}
