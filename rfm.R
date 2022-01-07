@@ -47,6 +47,7 @@ library(DBI)
 library(RSQLite)
 library(dplyr)
 library(ggplot2)
+library(parallel)
 
 
 ## 读取节点
@@ -183,6 +184,27 @@ update_s_table <- function(s_table,
     colnames(res) <- colnames(s_table)
     return(res)
 }
+
+
+## 更新表格的并行版本
+## 在使用本版本之前需要手动将用到的函数发送给各个核心
+## clusterExport(cl,deparse(substitute(update_v_status)))
+par_update_s_table <- function(s_table,
+                               vtable,
+                               etable,
+                               rep = 1){
+
+    time <- s_table[1,3] + 1
+    res <- t(parSapply(cl, 1:nrow(s_table), function(row){
+        c(s_table$aid[row],
+          update_v_status(s_table$vid[row], vtable, etable, s_table),
+          time,
+          rep)}))
+    res <- as.data.frame(res)
+    colnames(res) <- colnames(s_table)
+    return(res)
+}
+
 
 
 ## 控制模拟
