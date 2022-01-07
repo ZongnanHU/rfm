@@ -43,9 +43,10 @@
 
 
 
+library(DBI)
+library(RSQLite)
 library(dplyr)
 library(ggplot2)
-
 
 
 ## 读取节点
@@ -204,6 +205,29 @@ main_simulate <- function(init_table,
         res <- c(res, sub_res)
     }
     return(bind_rows(res))
+}
+
+
+## 在数据库中控制模拟
+main_simulate_db <- function(con,
+                             tb_name,
+                             init_table,
+                             vtable,
+                             etable,
+                             up_func = update_s_table,
+                             times = 1000,
+                             rep = 10){
+    for(i in 1:rep){
+        table1 <- init_table
+        table1$rep <- i
+        dbAppendTable(con, tb_name, table1)
+        for(time in 2:(times + 1)){
+            table2 <- up_func(table1, vtable, etable, i)
+            dbAppendTable(con, tb_name, table2)
+            table1 <- table2
+            cat(i, ":", time, "\n")
+        }
+    }
 }
 
 
