@@ -171,12 +171,11 @@ update_v_status <- function(vid, vtable, etable, s_table, ua = 0.3){
 update_s_table <- function(s_table,
                            vtable,
                            etable,
-                           up_func = update_v_status,
                            rep = 1){
     time <- s_table[1,3] + 1
     res <- t(sapply(1:nrow(s_table), function(row){
         c(s_table$aid[row],
-          up_func(s_table$vid[row], vtable, etable, s_table),
+          update_v_status(s_table$vid[row], vtable, etable, s_table),
           time,
           rep)}))
     res <- as.data.frame(res)
@@ -189,7 +188,7 @@ update_s_table <- function(s_table,
 main_simulate <- function(init_table,
                           vtable,
                           etable,
-                          up_func = update_v_status,
+                          up_func = update_s_table,
                           times = 1000,
                           rep = 10){
     res <- list()
@@ -198,9 +197,8 @@ main_simulate <- function(init_table,
         init_table$rep <- i
         sub_res[[1]] <- init_table
         for(time in 2:(times + 1)){
-            sub_res[[time]] <- update_s_table(sub_res[[time-1]],
-                                              vtable, etable,
-                                              up_func, i)
+            sub_res[[time]] <- up_func(sub_res[[time-1]],
+                                       vtable, etable, i)
             cat(i, ":", time, "\n")
         }
         res <- c(res, sub_res)
